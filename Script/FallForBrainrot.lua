@@ -1,3 +1,4 @@
+
 local _version = "1.6.66"
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/download/" .. _version .. "/main.lua"))()
 
@@ -66,77 +67,113 @@ local Farm = Window:Tab({
 	},
 })
 
-local scannedParts = {}
+local lastSavedCFrame = nil
+local scannedModels = {} -- Menyimpan referensi model
 
 local Dropdown = Farm:Dropdown({
-    Title = "Select To teleport",
-    Values = {"None"},
+    Title = "Select Guard to teleport",
+    Values = {"Scan first..."},
     Callback = function(selected)
-        -- Cek apakah opsi yang dipilih ada di dalam daftar part hasil scan
-        if scannedParts[selected] and scannedParts[selected]:IsA("BasePart") then
-            -- Teleport pemain ke posisi part (+3 studs ke atas)
-            RootPart.CFrame = scannedParts[selected].CFrame + Vector3.new(0, 3, 0)
+        -- Check if model exists
+        local targetModel = scannedModels[selected]
+        
+        if targetModel then
+            -- Find a valid target part (HumanoidRootPart or any BasePart)
+            local targetPart = targetModel:FindFirstChild("HumanoidRootPart") or targetModel:FindFirstChildWhichIsA("BasePart")
             
-            WindUI:Notify({
-                Title = "Teleported",
-                Content = "Teleported to: " .. selected,
-                Duration = 3
-            })
+            if targetPart then
+                RootPart.CFrame = targetPart.CFrame + Vector3.new(0, 3, 0)
+                
+                WindUI:Notify({
+                    Title = "Teleported",
+                    Content = "Teleporting to: " .. selected,
+                    Duration = 3
+                })
+            else
+                WindUI:Notify({
+                    Title = "Error",
+                    Content = "Model does not have a valid position.",
+                    Duration = 3
+                })
+            end
         end
     end
 })
 
--- 2. BUTTON (Scan)
+-- 2. BUTTON (Scan & Remember Position)
 local Scan = Farm:Button({
     Title = "Scan",
-    Desc = "Scan Folder ItemSpawners",
+    Desc = "Save current position & scan Guards",
     Icon = "search",
-    IconAlign = "Right",
-    IconColor = Color3.fromHex("#ffffff"),
     Color = Color3.fromRGB(100, 100, 255),
-    Locked = false,
     
     Callback = function()
-        -- Cari Folder Spawner
-        local spawnerFolder = workspace:FindFirstChild("DropperParts") and workspace.DropperParts:FindFirstChild("ItemSpawners")
+        -- A. Save current standing position
+        lastSavedCFrame = RootPart.CFrame
         
-        if not spawnerFolder then
+        -- B. Locate the Guards Folder
+        local guardsFolder = workspace:FindFirstChild("DropperParts") and workspace.DropperParts:FindFirstChild("Guards")
+        
+        if not guardsFolder then
             WindUI:Notify({
                 Title = "Error",
-                Content = "Folder ItemSpawners tidak ditemukan!",
+                Content = "Folder DropperParts.Guards not found!",
                 Duration = 4
             })
             return
         end
 
         local optionsList = {}
-        scannedParts = {} -- Reset tabel part
+        scannedModels = {} 
 
-        -- Loop semua folder (Common, Rare, Legendary, dll.)
-        for _, folder in pairs(spawnerFolder:GetChildren()) do
-            for _, item in pairs(folder:GetChildren()) do
-                if item:IsA("BasePart") then
-                    -- Format nama item di dropdown: "Rare - PartName"
-                    local itemLabel = folder.Name .. " - " .. item.Name
-                    
-                    table.insert(optionsList, itemLabel)
-                    scannedParts[itemLabel] = item -- Simpan referensi objek part
-                end
+        -- C. Scan all Models inside the Guards folder
+        for _, model in pairs(guardsFolder:GetChildren()) do
+            if model:IsA("Model") or model:IsA("Folder") then
+                local modelName = model.Name
+                table.insert(optionsList, modelName)
+                scannedModels[modelName] = model
             end
         end
 
-        -- Jika tidak ada part yang ditemukan
-        if #optionsList == 0 then
-            table.insert(optionsList, "No Items Found")
+        -- D. Update Dropdown
+        if #optionsList > 0 then
+            Dropdown:SetValues(optionsList)
+            WindUI:Notify({
+                Title = "Success",
+                Content = "Position Saved & Found " .. tostring(#optionsList) .. " Guards.",
+                Duration = 3
+            })
+        else
+            Dropdown:SetValues({"No Guards Found"})
+            WindUI:Notify({
+                Title = "Empty",
+                Content = "No models found in Guards folder.",
+                Duration = 3
+            })
         end
+    end
+})
 
-        -- Perbarui pilihan pada Dropdown WindUI
-        Dropdown:SetValues(optionsList)
-
-        WindUI:Notify({
-            Title = "Scan Complete",
-            Content = "Ditemukan " .. tostring(#optionsList) .. " item.",
-            Duration = 3
-        })
+-- 3. BUTTON (Return to saved position)
+local BackButton = Farm:Button({
+    Title = "Back to Start",
+    Desc = "Return to saved position",
+    Icon = "undo-2",
+    Color = Color3.fromRGB(80, 150, 80),
+    Callback = function()
+        if lastSavedCFrame then
+            RootPart.CFrame = lastSavedCFrame
+            WindUI:Notify({
+                Title = "Returning",
+                Content = "Back to saved position.",
+                Duration = 2
+            })
+        else
+            WindUI:Notify({
+                Title = "Error",
+                Content = "No position saved! Click Scan first.",
+                Duration = 3
+            })
+        end
     end
 })
