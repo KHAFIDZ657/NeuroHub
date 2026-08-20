@@ -50,9 +50,9 @@ local Game = Window:Tab({
 })
 
 local game1 = Game:Button({
-    Title = "Not Available",
-    Color = Color3.fromRGB(128, 128, 128), -- abu abu
-	Icon = "badge-x",
+    Title = "Fall For Brainrot",
+    Color = Color3.fromRGB(255, 255, 0), -- abu abu
+	Icon = "code-xml",
     Callback = function()
 			WindUI:Notify({
             Title = "Not available",
