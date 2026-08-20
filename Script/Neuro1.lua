@@ -19,7 +19,7 @@ local Window = WindUI:CreateWindow({
 local About = Window:Tab({
     Title = "About",
     Desc = "About NeuroHub", -- optional
-    Icon = "info", -- lucide icon or "rbxassetid://" or URL. optional
+    Icon = "badge-info", -- lucide icon or "rbxassetid://" or URL. optional
     IconColor = Color3.fromRGB(173, 216, 230), -- custom icon color. optional
     IconShape = "Square", -- "Square" or "Circle". optional
     IconThemed = true, -- use theme colors. optional
@@ -42,4 +42,22 @@ local Version = Window:Tag({
 local Paragraph = About:Paragraph({
     Title = "About",
     Desc = "NeuroHub is a script designed to provide basic yet useful features.\nVersion 1.0 "
+})
+
+local Game = Window:Tab({
+    Title = "Game",
+    Icon = "gamepad-2", -- optional
+})
+
+local game1 = Game:Button({
+    Title = "Not Available",
+    Color = Color3.fromRGB(128, 128, 128), -- idk
+	Icon = "badge-x"
+    Callback = function()
+			WindUI:Notify({
+            Title = "Not available",
+            Content = "In searching, In Development",
+            Duration = 5
+        })
+    end
 })
