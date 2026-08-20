@@ -33,7 +33,7 @@ local Tab = Window:Tab({
 	},
 })
 
-Tab:Tag({
+local Version = Window:Tag({
     Title = "1.0",
     Icon = "rocket", -- optional
     Color = Color3.fromRGB(0, 0, 128), -- custom color
