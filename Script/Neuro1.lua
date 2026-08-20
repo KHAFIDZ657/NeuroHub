@@ -16,7 +16,7 @@ local Window = WindUI:CreateWindow({
     },
 })
 
-local Tab = Window:Tab({
+local About = Window:Tab({
     Title = "About",
     Desc = "About NeuroHub", -- optional
     Icon = "info", -- lucide icon or "rbxassetid://" or URL. optional
@@ -39,3 +39,7 @@ local Version = Window:Tag({
     Color = Color3.fromRGB(0, 0, 128), -- custom color
 })
 
+local Paragraph = About:Paragraph({
+    Title = "About",
+    Desc = "NeuroHub is a script designed to provide basic yet useful features./nVersion 1.0 "
+})
