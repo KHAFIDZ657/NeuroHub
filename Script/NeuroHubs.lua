@@ -3,7 +3,7 @@ local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/rel
 
 local Window = WindUI:CreateWindow({
     Title = "NeuroHub", -- window title
-    Icon = "atom", -- lucide icon or "rbxassetid://" or URL. optional
+    Icon = "https://raw.githubusercontent.com/KHAFIDZ657/NeuroHub/main/Image/MainIcon.png", -- lucide icon or "rbxassetid://" or URL. optional
     Author = "by Khafidz.", -- window subtitle. optional
     Folder = "NeuroHub", -- folder to save keys and images
     
