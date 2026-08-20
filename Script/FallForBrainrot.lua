@@ -1,48 +1,45 @@
-
 local _version = "1.6.66"
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/download/" .. _version .. "/main.lua"))()
 
 local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
-local Character = Player.Character or Player.CharacterAdded:Wait()
-local RootPart = Character:WaitForChild("HumanoidRootPart")
+
+local function getRootPart()
+    local char = Player.Character or Player.CharacterAdded:Wait()
+    return char:WaitForChild("HumanoidRootPart")
+end
 
 local Window = WindUI:CreateWindow({
-    Title = "NeuroHub [Beta]", -- window title
-    Icon = "https://raw.githubusercontent.com/KHAFIDZ657/NeuroHub/main/Image/MainIcon.png", -- lucide icon or "rbxassetid://" or URL. optional
-    Author = "by Khafidz.", -- window subtitle. optional
-    Folder = "NeuroFall", -- folder to save keys and images
+    Title = "NeuroHub [Beta]",
+    Icon = "https://raw.githubusercontent.com/KHAFIDZ657/NeuroHub/main/Image/MainIcon.png",
+    Author = "by Khafidz.",
+    Folder = "NeuroFall",
     
-    User = { -- user information located at the bottom left
-        Enabled = true, -- can be toggled with Window.User:Enable() or Window.User:Disable()
-        Anonymous = false, -- can be toggled with Window.User:SetAnonymous(true) --(true or false)
-        Callback = function() -- callback on click. optional. it can be removed
-            print("Just Callback of User button. ")
+    User = {
+        Enabled = true,
+        Anonymous = false,
+        Callback = function()
+            print("User callback clicked")
         end,
     },
 })
 
 local About = Window:Tab({
     Title = "About",
-    Desc = "About NeuroHub", -- optional
-    Icon = "badge-info", -- lucide icon or "rbxassetid://" or URL. optional
-    IconColor = Color3.fromRGB(173, 216, 230), -- custom icon color. optional
-    IconShape = "Square", -- "Square" or "Circle". optional
-    IconThemed = true, -- use theme colors. optional
-    Locked = false, -- disable tab interaction. optional
-    ShowTabTitle = false, -- show title inside tab. optional
-    Border = true, -- add border around tab. optional
-    CustomEmptyPage = { -- custom empty page when no elements are added to the tab. optional
-		Icon = "lucide:smile", -- icon for empty page. optional
-		Title = "empty", -- title for empty page. optional
-		Desc = "Just a tabs normal", -- description for empty page. optional
-	},
+    Desc = "About NeuroHub",
+    Icon = "badge-info",
+    IconColor = Color3.fromRGB(173, 216, 230),
+    IconShape = "Square",
+    IconThemed = true,
+    Locked = false,
+    ShowTabTitle = false,
+    Border = true,
 })
 
 local Version = Window:Tag({
     Title = "Fall For Brainrot",
-    Icon = "rocket", -- optional
-    Color = Color3.fromRGB(0, 0, 128), -- custom color
+    Icon = "rocket",
+    Color = Color3.fromRGB(0, 0, 128),
 })
 
 local Paragraph = About:Paragraph({
@@ -52,47 +49,58 @@ local Paragraph = About:Paragraph({
 
 local Farm = Window:Tab({
     Title = "Farm",
-    Desc = "Auto Farming", -- optional
-    Icon = "repeat", -- lucide icon or "rbxassetid://" or URL. optional
-    IconColor = Color3.fromRGB(255, 100, 100), -- custom icon color. optional
-    IconShape = "Square", -- "Square" or "Circle". optional
-    IconThemed = true, -- use theme colors. optional
-    Locked = false, -- disable tab interaction. optional
-    ShowTabTitle = false, -- show title inside tab. optional
-    Border = true, -- add border around tab. optional
-    CustomEmptyPage = { -- custom empty page when no elements are added to the tab. optional
-		Icon = "lucide:smile", -- icon for empty page. optional
-		Title = "Empty", -- title for empty page. optional
-		Desc = "Maybe In Development", -- description for empty page. optional
-	},
+    Desc = "Auto Farming",
+    Icon = "repeat",
+    IconColor = Color3.fromRGB(255, 100, 100),
+    IconShape = "Square",
+    IconThemed = true,
+    Locked = false,
+    ShowTabTitle = false,
+    Border = true,
 })
 
 local lastSavedCFrame = nil
-local scannedModels = {} -- Menyimpan referensi model
+local scannedModels = {}
 
+-- 1. DROPDOWN (Teleportasi Otomatis Menyesuaikan Ukuran Guard)
 local Dropdown = Farm:Dropdown({
     Title = "Select Guard to teleport",
     Values = {"Scan first..."},
     Callback = function(selected)
-        -- Check if model exists
-        local targetModel = scannedModels[selected]
+        local targetObj = scannedModels[selected]
         
-        if targetModel then
-            -- Find a valid target part (HumanoidRootPart or any BasePart)
-            local targetPart = targetModel:FindFirstChild("HumanoidRootPart") or targetModel:FindFirstChildWhichIsA("BasePart")
-            
-            if targetPart then
-                RootPart.CFrame = targetPart.CFrame + Vector3.new(0, 3, 0)
+        if targetObj then
+            local hrp = getRootPart()
+            local targetCFrame = nil
+            local offsetY = 3 -- Jarak bawaan jika berupa objek tunggal
+
+            if targetObj:IsA("Model") then
+                -- Hitung posisi pusat dan ukuran tinggi (size.Y) dari Model Guard
+                local cframe, size = targetObj:GetBoundingBox()
+                -- Tempatkan tepat di atas puncak Guard (+ setengah tingginya + 3 studs)
+                targetCFrame = cframe + Vector3.new(0, (size.Y / 2) + 3, 0)
+            elseif targetObj:IsA("BasePart") then
+                targetCFrame = targetObj.CFrame + Vector3.new(0, (targetObj.Size.Y / 2) + 3, 0)
+            else
+                -- Jika berupa Folder/Configuration, cari part di dalamnya
+                local anyPart = targetObj:FindFirstChildWhichIsA("BasePart", true)
+                if anyPart then 
+                    targetCFrame = anyPart.CFrame + Vector3.new(0, (anyPart.Size.Y / 2) + 3, 0) 
+                end
+            end
+
+            if targetCFrame and hrp then
+                hrp.CFrame = targetCFrame
                 
                 WindUI:Notify({
                     Title = "Teleported",
-                    Content = "Teleporting to: " .. selected,
+                    Content = "Teleported to: " .. selected,
                     Duration = 3
                 })
             else
                 WindUI:Notify({
                     Title = "Error",
-                    Content = "Model does not have a valid position.",
+                    Content = "Could not find a valid position for " .. selected,
                     Duration = 3
                 })
             end
@@ -100,7 +108,7 @@ local Dropdown = Farm:Dropdown({
     end
 })
 
--- 2. BUTTON (Scan & Remember Position)
+-- 2. SCAN BUTTON
 local Scan = Farm:Button({
     Title = "Scan",
     Desc = "Save current position & scan Guards",
@@ -108,11 +116,13 @@ local Scan = Farm:Button({
     Color = Color3.fromRGB(100, 100, 255),
     
     Callback = function()
-        -- A. Save current standing position
-        lastSavedCFrame = RootPart.CFrame
+        local hrp = getRootPart()
+        if hrp then
+            lastSavedCFrame = hrp.CFrame
+        end
         
-        -- B. Locate the Guards Folder
-        local guardsFolder = workspace:FindFirstChild("DropperParts") and workspace.DropperParts:FindFirstChild("Guards")
+        local dropperParts = workspace:FindFirstChild("DropperParts")
+        local guardsFolder = dropperParts and dropperParts:FindFirstChild("Guards")
         
         if not guardsFolder then
             WindUI:Notify({
@@ -126,43 +136,48 @@ local Scan = Farm:Button({
         local optionsList = {}
         scannedModels = {} 
 
-        -- C. Scan all Models inside the Guards folder
-        for _, model in pairs(guardsFolder:GetChildren()) do
-            if model:IsA("Model") or model:IsA("Folder") then
-                local modelName = model.Name
-                table.insert(optionsList, modelName)
-                scannedModels[modelName] = model
-            end
+        for _, child in pairs(guardsFolder:GetChildren()) do
+            local itemName = child.Name
+            table.insert(optionsList, itemName)
+            scannedModels[itemName] = child
         end
 
-        -- D. Update Dropdown
         if #optionsList > 0 then
-            Dropdown:SetValues(optionsList)
+            if Dropdown.SetValues then
+                Dropdown:SetValues(optionsList)
+            elseif Dropdown.SetOptions then
+                Dropdown:SetOptions(optionsList)
+            elseif Dropdown.Refresh then
+                Dropdown:Refresh(optionsList)
+            end
+
             WindUI:Notify({
                 Title = "Success",
                 Content = "Position Saved & Found " .. tostring(#optionsList) .. " Guards.",
                 Duration = 3
             })
         else
-            Dropdown:SetValues({"No Guards Found"})
+            if Dropdown.SetValues then Dropdown:SetValues({"No Guards Found"}) end
+            
             WindUI:Notify({
                 Title = "Empty",
-                Content = "No models found in Guards folder.",
+                Content = "Guards folder is empty.",
                 Duration = 3
             })
         end
     end
 })
 
--- 3. BUTTON (Return to saved position)
+-- 3. BACK BUTTON
 local BackButton = Farm:Button({
     Title = "Back to Start",
     Desc = "Return to saved position",
     Icon = "undo-2",
     Color = Color3.fromRGB(80, 150, 80),
     Callback = function()
-        if lastSavedCFrame then
-            RootPart.CFrame = lastSavedCFrame
+        local hrp = getRootPart()
+        if lastSavedCFrame and hrp then
+            hrp.CFrame = lastSavedCFrame
             WindUI:Notify({
                 Title = "Returning",
                 Content = "Back to saved position.",
@@ -175,5 +190,20 @@ local BackButton = Farm:Button({
                 Duration = 3
             })
         end
+    end
+})
+
+Farm:Divider()
+
+local Auto = Farm:Toggle({
+    Title = "Farming brick",
+    Desc = "Use One part to Farming", -- optional
+    Icon = "pickaxe", -- lucide icon or "rbxassetid://". optional
+    Value = false, -- initial state. optional
+    Type = "Toggle", -- "Toggle" or "Checkbox". optional
+    Locked = false, -- disable toggle. optional
+    Flag = "my_farm", -- for config saving. optional
+    Callback = function(state)
+        print("State changed:", state)
     end
 })
