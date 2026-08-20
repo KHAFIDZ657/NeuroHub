@@ -9,9 +9,9 @@ local Window = WindUI:CreateWindow({
     
     User = { -- user information located at the bottom left
         Enabled = true, -- can be toggled with Window.User:Enable() or Window.User:Disable()
-        Anonymous = true, -- can be toggled with Window.User:SetAnonymous(true) --(true or false)
+        Anonymous = false, -- can be toggled with Window.User:SetAnonymous(true) --(true or false)
         Callback = function() -- callback on click. optional. it can be removed
-            print("You name is 'user' ")
+            print("Just Callback of User button. ")
         end,
     },
 })
@@ -34,7 +34,7 @@ local About = Window:Tab({
 })
 
 local Version = Window:Tag({
-    Title = "1.0",
+    Title = "1.1",
     Icon = "rocket", -- optional
     Color = Color3.fromRGB(0, 0, 128), -- custom color
 })
@@ -51,7 +51,7 @@ local Game = Window:Tab({
 
 local game1 = Game:Button({
     Title = "Not Available",
-    Color = Color3.fromRGB(128, 128, 128), -- idk
+    Color = Color3.fromRGB(128, 128, 128), -- abu abu
 	Icon = "badge-x"
     Callback = function()
 			WindUI:Notify({
