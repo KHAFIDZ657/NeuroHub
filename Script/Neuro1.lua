@@ -41,5 +41,5 @@ local Version = Window:Tag({
 
 local Paragraph = About:Paragraph({
     Title = "About",
-    Desc = "NeuroHub is a script designed to provide basic yet useful features./nVersion 1.0 "
+    Desc = "NeuroHub is a script designed to provide basic yet useful features.\nVersion 1.0 "
 })
