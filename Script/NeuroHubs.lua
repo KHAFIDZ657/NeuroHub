@@ -54,10 +54,40 @@ local game1 = Game:Button({
     Color = Color3.fromRGB(255, 255, 0), -- abu abu
 	Icon = "code-xml",
     Callback = function()
-			WindUI:Notify({
-            Title = "Not available",
-            Content = "In searching, In Development",
+			 -- 1. Display loading notification first
+        WindUI:Notify({
+            Title = "Please Wait..",
+            Content = "Loading..",
             Duration = 5
         })
+
+        -- Brief pause for UX before processing verification
+        task.wait(1.5)
+
+        -- 2. Game ID verification
+        local TARGET_GAME_ID = 9793308933
+        
+        if game.PlaceId == TARGET_GAME_ID or game.GameId == TARGET_GAME_ID then
+            -- 3. Execute GitHub script if Game ID matches
+            -- Replace with your GitHub RAW URL
+            local url = "https://raw.githubusercontent.com/KHAFIDZ657/NeuroHub/main/Script/FallForBrainrot.lua"
+            
+            local success, result = pcall(function()
+                return game:HttpGet(url)
+            end)
+
+            if success and result then
+                loadstring(result)()
+            else
+                WindUI:Notify({
+                    Title = "Error",
+                    Content = "Failed to fetch script from GitHub.",
+                    Duration = 5
+                })
+            end
+        else
+            -- 4. Kick local player if Game ID differs
+            game.Players.LocalPlayer:Kick("NeuroHub Protection\n\nYou in Different Game.")
+        end
     end
 })
