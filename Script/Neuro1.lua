@@ -52,7 +52,7 @@ local Game = Window:Tab({
 local game1 = Game:Button({
     Title = "Not Available",
     Color = Color3.fromRGB(128, 128, 128), -- abu abu
-	Icon = "badge-x"
+	Icon = "badge-x",
     Callback = function()
 			WindUI:Notify({
             Title = "Not available",
