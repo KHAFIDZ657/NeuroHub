@@ -6,7 +6,7 @@ local Window = WindUI:CreateWindow({
     Icon = "https://raw.githubusercontent.com/KHAFIDZ657/NeuroHub/main/Image/MainIcon.png", -- lucide icon or "rbxassetid://" or URL. optional
     Author = "by Khafidz.", -- window subtitle. optional
     Folder = "NeuroHub", -- folder to save keys and images
-	Theme = Color3.fromRGB(128, 128, 128),
+	Theme = "Dark"
     
     User = { -- user information located at the bottom left
         Enabled = true, -- can be toggled with Window.User:Enable() or Window.User:Disable()
