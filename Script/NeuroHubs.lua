@@ -1,5 +1,6 @@
 local _version = "1.6.66"
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/download/" .. _version .. "/main.lua"))()
+local TeleportService = game:GetService("TeleportService")
 
 local Window = WindUI:CreateWindow({
     Title = "NeuroHub", -- window title
@@ -52,43 +53,59 @@ local Game = Window:Tab({
 
 local game1 = Game:Button({
     Title = "Fall For Brainrot",
-    Color = Color3.fromRGB(255, 255, 0), -- abu abu
-	Icon = "code-xml",
+    Color = Color3.fromRGB(255, 255, 0), -- Yellow
+    Icon = "code-xml",
     Callback = function()
-			 -- 1. Display loading notification first
-        WindUI:Notify({
+        Window:Notify({
             Title = "Please Wait..",
             Content = "Loading..",
             Duration = 5
         })
 
-        -- Brief pause for UX before processing verification
         task.wait(1.5)
 
-        -- 2. Game ID verification
         local TARGET_GAME_ID = 9793308933
-        
+        local scriptUrl = "https://raw.githubusercontent.com/KHAFIDZ657/NeuroHub/main/Script/FallForBrainrot.lua"
+
         if game.PlaceId == TARGET_GAME_ID or game.GameId == TARGET_GAME_ID then
-            -- 3. Execute GitHub script if Game ID matches
-            -- Replace with your GitHub RAW URL
-            local url = "https://raw.githubusercontent.com/KHAFIDZ657/NeuroHub/main/Script/FallForBrainrot.lua"
-            
+            -- Execute script if the player is in the correct game
             local success, result = pcall(function()
-                return game:HttpGet(url)
+                return game:HttpGet(scriptUrl)
             end)
 
             if success and result then
                 loadstring(result)()
             else
-                WindUI:Notify({
+                Window:Notify({
                     Title = "Error",
                     Content = "Failed to fetch script from GitHub.",
                     Duration = 5
                 })
             end
         else
-            -- 4. Kick local player if Game ID differs
-            game.Players.LocalPlayer:Kick("NeuroHub Protection\n\nYou in Different Game.")
+            -- Random logic when the player is in the WRONG game
+            local chance = math.random(1, 100)
+
+            if chance <= 30 then
+                -- 30% CHANCE: Teleport to the official game & auto-execute script
+                Window:Notify({
+                    Title = "Redirecting..",
+                    Content = "Wrong game! Teleporting to the correct game...",
+                    Duration = 5
+                })
+
+                -- Save script to automatically run after server teleport
+                local queueOnTeleport = (syn and syn.queue_on_teleport) or queue_on_teleport or (fluxus and fluxus.queue_on_teleport)
+                if queueOnTeleport then
+                    queueOnTeleport('loadstring(game:HttpGet("' .. scriptUrl .. '"))()')
+                end
+
+                task.wait(0.8)
+                TeleportService:Teleport(TARGET_GAME_ID, game.Players.LocalPlayer)
+            else
+                -- 70% CHANCE: Kick from the game
+                game.Players.LocalPlayer:Kick("NeuroHub Protection\n\nExecution Blocked: Unsafe Game Environment.")
+            end
         end
     end
 })
