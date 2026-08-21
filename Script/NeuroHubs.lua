@@ -1,6 +1,5 @@
 local _version = "1.6.66"
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/download/" .. _version .. "/main.lua"))()
-WindUI:SetFolder("NeuroHubConfig")
 
 local Window = WindUI:CreateWindow({
     Title = "NeuroHub", -- window title
