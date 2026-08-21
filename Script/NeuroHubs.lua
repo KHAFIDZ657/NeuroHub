@@ -7,6 +7,7 @@ local Window = WindUI:CreateWindow({
     Icon = "https://raw.githubusercontent.com/KHAFIDZ657/NeuroHub/main/Image/MainIcon.png", -- lucide icon or "rbxassetid://" or URL. optional
     Author = "by Khafidz.", -- window subtitle. optional
     Folder = "NeuroHub", -- folder to save keys and images
+	Theme = Color3.fromRGB(128, 128, 128),
     
     User = { -- user information located at the bottom left
         Enabled = true, -- can be toggled with Window.User:Enable() or Window.User:Disable()
@@ -115,17 +116,11 @@ local ColorGUI = Setting:Colorpicker({
     Desc = "Pick a color",
     Default = Color3.fromRGB(128, 128, 128),
     Locked = false,
-    Flag = "custom_colorGUI", -- Config key/identifier
+    Flag = "custom_colorGUI",
     Callback = function(color)
-        -- Change the UI accent/theme color in real-time
-        Window:SetTheme({
-            Accent = color
-        })
-        
-        -- Automatically save the configuration when the color changes
-        WindUI:SaveConfig("default")
+        -- Mengubah warna aksen tema WindUI secara langsung
+        if WindUI.Theme then
+            WindUI.Theme.Accent = color
+        end
     end
 })
-
--- Automatically load saved configuration when the script runs
-WindUI:LoadConfig("default")
