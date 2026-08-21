@@ -1,5 +1,6 @@
 local _version = "1.6.66"
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/download/" .. _version .. "/main.lua"))()
+WindUI:SetFolder("NeuroHubConfig")
 
 local Window = WindUI:CreateWindow({
     Title = "NeuroHub", -- window title
@@ -34,7 +35,7 @@ local About = Window:Tab({
 })
 
 local Version = Window:Tag({
-    Title = "1.1",
+    Title = "1.2",
     Icon = "rocket", -- optional
     Color = Color3.fromRGB(0, 0, 128), -- custom color
 })
@@ -91,3 +92,40 @@ local game1 = Game:Button({
         end
     end
 })
+
+local Setting = Window:Tab({
+    Title = "Setting",
+    Desc = "Settings", -- optional
+    Icon = "cog", -- lucide icon or "rbxassetid://" or URL. optional
+    IconColor = Color3.fromRGB(255, 255, 255), -- custom icon color. optional
+    IconShape = "Square", -- "Square" or "Circle". optional
+    IconThemed = true, -- use theme colors. optional
+    Locked = false, -- disable tab interaction. optional
+    ShowTabTitle = false, -- show title inside tab. optional
+    Border = true, -- add border around tab. optional
+    CustomEmptyPage = { -- custom empty page when no elements are added to the tab. optional
+		Icon = "lucide:smile", -- icon for empty page. optional
+		Title = "Empty", -- title for empty page. optional
+		Desc = "In Development.", -- description for empty page. optional
+	},
+})
+
+local ColorGUI = Setting:Colorpicker({
+    Title = "ColorGui",
+    Desc = "Pick a color",
+    Default = Color3.fromRGB(128, 128, 128),
+    Locked = false,
+    Flag = "custom_colorGUI", -- Config key/identifier
+    Callback = function(color)
+        -- Change the UI accent/theme color in real-time
+        Window:SetTheme({
+            Accent = color
+        })
+        
+        -- Automatically save the configuration when the color changes
+        WindUI:SaveConfig("default")
+    end
+})
+
+-- Automatically load saved configuration when the script runs
+WindUI:LoadConfig("default")
