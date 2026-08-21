@@ -74,12 +74,23 @@ local game1 = Game:Button({
             end)
 
             if success and result then
-                loadstring(result)()
+                local execSuccess, execErr = pcall(function()
+                    loadstring(result)()
+                end)
+                
+                -- Catch error if loadstring fails
+                if not execSuccess then
+                    Window:Notify({
+                        Title = "[SCRIPT ERROR]",
+                        Content = tostring(execErr),
+                        Duration = 8
+                    })
+                end
             else
                 Window:Notify({
-                    Title = "Error",
-                    Content = "Failed to fetch script from GitHub.",
-                    Duration = 5
+                    Title = "[FETCH ERROR]",
+                    Content = "Failed to fetch script from GitHub.\nDetails: " .. tostring(result),
+                    Duration = 8
                 })
             end
         else
@@ -100,7 +111,7 @@ local game1 = Game:Button({
                     queueOnTeleport('loadstring(game:HttpGet("' .. scriptUrl .. '"))()')
                 end
 
-                task.wait(0.8)
+                task.wait(1)
                 TeleportService:Teleport(TARGET_GAME_ID, game.Players.LocalPlayer)
             else
                 -- 70% CHANCE: Kick from the game
